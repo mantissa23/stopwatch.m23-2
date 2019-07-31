@@ -7,13 +7,35 @@
     >
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <span class="title ml-3 mr-5">Stopwatch&nbsp;<span class="font-weight-light">23</span></span>
-      <v-text-field
-        solo-inverted
-        flat
-        hide-details
-        label="Search"
-        prepend-inner-icon="search"
-      ></v-text-field>
+	  
+      <v-card
+			width="600"
+			style="top: 55px; left: 200px;"
+			tile
+		  >
+			<v-list>
+			  <v-subheader>TASK NAME</v-subheader>
+			  <v-list-item-group color="primary">
+				<v-list-item @click="editable = true">
+				  <v-list-item-icon>
+					<v-icon>mdi-alarm</v-icon>
+				  </v-list-item-icon>
+				  <v-list-item-content>
+					<v-list-item-title class="display-1">
+						<v-text-field
+							v-if="editable"
+							solo-inverted
+							flat
+							v-model="title"
+						  ></v-text-field>
+						<div v-else class="display-1">{{ title }}</div>
+					</v-list-item-title>
+					<v-list-item-subtitle>{{ min }}:{{ sec }}:{{ ms }}</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+			  </v-list-item-group>
+			</v-list>
+		  </v-card>
       <v-spacer></v-spacer>
     </v-app-bar>
 
@@ -71,16 +93,101 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+	
+	<!--
+	<v-card
+      elevation="12"
+      width="256"
+    >
+		<v-navigation-drawer
+		  fixed
+		  right
+		  app
+		  floating
+		  permanent
+		  color="grey lighten-4"
+		>
+		  
+		  <v-list>
+				<v-list-item
+				  v-for="item in items.filter(i => i.text)"
+				  :key="item.text"
+				  link
+				>
+				  <v-list-item-icon>
+					<v-icon>{{ item.icon }}</v-icon>
+				  </v-list-item-icon>
 
-    <v-content>
+				  <v-list-item-content>
+					<v-list-item-title>{{ item.text }}</v-list-item-title>
+				  </v-list-item-content>
+				</v-list-item>
+			  </v-list>
+		</v-navigation-drawer>
+	</v-card>
+	-->
+	
+	<!--
+	<v-card
+    width="256"
+	  >
+		<v-navigation-drawer
+		  class="deep-purple accent-4"
+		  v-model="drawer2"
+		  app
+		  dark
+		  clipped
+		  absolute
+		  permanent
+		  right
+		>
+			<template v-slot:prepend>
+        <v-list-item two-line>
+          <v-list-item-avatar>
+            <img src="https://randomuser.me/api/portraits/women/81.jpg">
+          </v-list-item-avatar>
 
+          <v-list-item-content>
+            <v-list-item-title>Jane Smith</v-list-item-title>
+            <v-list-item-subtitle>Logged In</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </template>
+	  
+	  <v-divider></v-divider>
+	  
+		  <v-list>
+			<v-list-item
+			  v-for="item in items.filter(i => i.text)"
+			  :key="item.text"
+			  link
+			>
+			  <v-list-item-icon>
+				<v-icon>{{ item.icon }}</v-icon>
+			  </v-list-item-icon>
+
+			  <v-list-item-content>
+				<v-list-item-title>{{ item.text }}</v-list-item-title>
+			  </v-list-item-content>
+			</v-list-item>
+		  </v-list>
+
+		  <template v-slot:append>
+			<div class="pa-2">
+			  <v-btn block>Logout</v-btn>
+			</div>
+		  </template>
+		</v-navigation-drawer>
+	  </v-card>
+	  -->
+
+    <v-content>		
 
       <v-container
         fluid
         fill-height
         class="grey lighten-4"
       >
-	  
 	  
         <v-layout
           justify-center
@@ -96,7 +203,7 @@
 				</v-layout>
 			</v-flex>
           <v-flex shrink>
-            <v-tooltip v-if="timer === 0" right>
+            <v-tooltip v-if="timer === 0" top>
 			  <template v-slot:activator="{ on }">      
 				<v-btn
 				  color="error" 
@@ -111,9 +218,23 @@
 				</v-tooltip>
 				
 				<v-btn v-else color="success" @click.prevent="pause">Pause</v-btn>
+				
+				<v-btn v-if="timer === 0 && (time.min + time.sec) > 0" small class="ml-5" @click.prevent="reset">Reset</v-btn>
           </v-flex>
         </v-layout>
       </v-container>
+	  
+	  <v-container
+        fluid
+        class="grey lighten-4"
+      >
+	  <v-card
+				max-width="600"
+				class="mx-auto"
+			  >
+				<h2>{{ title }}</h2>
+			  </v-card>
+			  </v-container>
     </v-content>
   </v-app>
 </template>
@@ -125,6 +246,10 @@ const ITEM_KEY = 'TIME';
 export default {
 data: () => ({
 
+title: 'Title',
+
+editable: false,
+
 autoSaveDelay: 1000,
 
 timer: 0,
@@ -135,6 +260,7 @@ time: {
 	ms: 0,
 },
   drawer: null,
+  drawer2: null,
   items: [
 	{ icon: 'lightbulb_outline', text: 'Notes' },
 	{ icon: 'touch_app', text: 'Reminders' },
@@ -209,6 +335,16 @@ methods: {
 	
 	save() {
 		STORAGE.setItem(ITEM_KEY, JSON.stringify(this.time));
+	},
+	
+	reset() {
+		this.time = {
+			min: 0,
+			sec: 0,
+			ms: 0,
+		};
+		
+		STORAGE.clear();
 	},
 },
 }
