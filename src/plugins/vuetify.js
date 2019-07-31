@@ -5,27 +5,27 @@ import ru from 'vuetify/es5/locale/ru';
 Vue.use(Vuetify);
 
 export default new Vuetify({
-  theme: {
-      options: {
-        customProperties: true,
-      },
-    themes: {
-      light: {
-        primary: '#ee44aa',
-        secondary: '#424242',
-        accent: '#82B1FF',
-        error: '#FF5252',
-        info: '#2196F3',
-        success: '#4CAF50',
-        warning: '#FFC107'
-      },
-    },
-  },
-    lang: {
-      locales: { ru },
-      current: 'ru',
-    },
-  icons: {
-    iconfont: 'md',
-  },
+	theme: {
+	options: {
+	customProperties: true,
+	},
+	themes: {
+	light: {
+	primary: '#ff5722',
+	secondary: '#ff9800',
+	accent: '#03a9f4',
+	error: '#f44336',
+	warning: '#ffeb3b',
+	info: '#795548',
+	success: '#8bc34a',
+	},
+	},
+	},
+	lang: {
+	locales: { ru },
+	current: 'ru',
+	},
+	icons: {
+	iconfont: 'md',
+	},
 });
